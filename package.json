@@ -15,7 +15,8 @@
   "keywords": [
     "apollo",
     "browser",
-    "bucklescript"
+    "bucklescript",
+    "reason"
   ],
   "author": "gtdev87",
   "license": "MIT",
@@ -33,8 +34,13 @@
   "dependencies": {
     "@apollo/react-hooks": "^3.0.0",
     "apollo-client": "2.6.3",
-    "reason-apollo": "https://github.com/GTDev87/reason-apollo#6bbcb0514f581b8fde861e6a5e5340bf41a83b13",
+    "reason-apollo": "git+https://github.com/GTDev87/reason-apollo.git#6bbcb0514f581b8fde861e6a5e5340bf41a83b13",
     "reason-apollo-hooks": "2.7.0",
     "reason-react": "0.7.0"
+  },
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib"
   }
 }
