@@ -1,0 +1,40 @@
+{
+  "name": "domain-renormalizr",
+  "version": "0.0.0",
+  "description": "Fetch bindings for BuckleScript",
+  "scripts": {
+    "build": "bsb -make-world",
+    "start": "bsb -make-world -w",
+    "clean": "bsb -clean-world",
+    "test": "exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GTDev87/domain-renormalizr.git"
+  },
+  "keywords": [
+    "apollo",
+    "browser",
+    "bucklescript"
+  ],
+  "author": "gtdev87",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GTDev87/domain-renormalizr/issues"
+  },
+  "homepage": "https://github.com/GTDev87/domain-renormalizr#readme",
+  "devDependencies": {
+    "@glennsl/bs-json": "^3.0.0",
+    "bs-platform": "5.1.0-dev.2"
+  },
+  "peerDependencies": {
+    "bs-platform": "5.1.0-dev.2"
+  },
+  "dependencies": {
+    "@apollo/react-hooks": "^3.0.0",
+    "apollo-client": "2.6.3",
+    "reason-apollo": "https://github.com/GTDev87/reason-apollo#6bbcb0514f581b8fde861e6a5e5340bf41a83b13",
+    "reason-apollo-hooks": "2.7.0",
+    "reason-react": "0.7.0"
+  }
+}

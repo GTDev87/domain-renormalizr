@@ -1,0 +1,28 @@
+{
+  "name": "domain-renormalizr",
+  "bsc-flags": ["-bs-no-version-header", "-bs-super-errors"],
+  "refmt": 3,
+  "reason": {
+    "react-jsx": 3
+  },
+  "bs-dependencies": [
+    "@glennsl/bs-json",
+    "reason-apollo-hooks",
+    "reason-apollo",
+    "reason-react"
+  ],
+  "package-specs": [{
+    "module": "commonjs",
+    "in-source": false
+  }],
+  "sources": [
+    {
+      "dir": "src",
+      "public": "all"
+    },
+    {
+      "dir": "examples",
+      "type": "dev"
+    }
+  ]
+}
