@@ -5,28 +5,29 @@ type _data = {
 
 
 module Local = ModelUtils.CreateFakeLocal();
-
 type _record = RecordType.Type.t(_data, Local.Record.t);
 
-let _defaultData = (id) => {
+type defaultParam = unit;
+let defaultParamData: defaultParam = ();
+
+let _defaultData = (_default, id) => {
   {
-    id: "",
+    id,
     seatNumber: 0,
   }
-  /* UI */
 };
 
-let _defaultRecordId = (id): _record => {
-  data: _defaultData(id),
+let _defaultRecordId = (defaultPar, id): _record => {
+  data: _defaultData(defaultPar, id),
   /* local: Classroom_Local.Model.Record.default(id), */
   local: Local.Record.default(id),
 };
 
 let _defaultRecord = (): _record => {
-  _defaultRecordId("id")
+  _defaultRecordId(defaultParamData, "id")
 };
 
-type defaultParam = unit;
-let _defaultWithId = ((): defaultParam, id: Type.uuid) => _defaultRecordId(id);
+
+let _defaultWithId = ((): defaultParam, id: Type.uuid) => _defaultRecordId(defaultParamData, id);
 
 let findId = (record : _record) => record.data.id;

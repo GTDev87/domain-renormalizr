@@ -18,5 +18,5 @@ module CreateFakeFragment(
 
   let toId = (obj) => obj##id;
   
-  let fromObject = (obj: Fields.t): data => RecordType._defaultData(toId(obj));
+  let fromObject = (obj: Fields.t): data => RecordType._defaultData(RecordType.defaultParamData, toId(obj));
 }

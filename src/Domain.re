@@ -50,10 +50,12 @@ module type RECORD = {
   type _record = RecordType.Type.t(_data, Local.Record.t);
 
   type defaultParam;
+
+  let defaultParamData: defaultParam;
   
-  let _defaultData: (Type.uuid) => _data;
-  let _defaultRecordId: (Type.uuid) => _record;
-  let _defaultRecord: unit => _record;
+  let _defaultData: (defaultParam, Type.uuid) => _data;
+  let _defaultRecordId: (defaultParam, Type.uuid) => _record;
+  let _defaultRecord: (defaultParam) => _record;
   let findId: (_record) => Type.uuid;
 
   let _defaultWithId: (defaultParam, Type.uuid) => _record;
@@ -101,9 +103,12 @@ module type MODEL = {
   and Record: {
     type t = _record;
     type defaultParam;
+
     type defaultFn = (defaultParam, ModelSchemaType.id) => t;
     let findId: (ModelRecord._record) => Type.uuid;
-    let default: unit => ModelRecord._record;
+    let default: defaultParam => ModelRecord._record;
+
+    let defaultParamData: defaultParam;
 
     // module Local: LOCAL_RECORD;
 
@@ -119,7 +124,7 @@ module type MODEL = {
 
   let fragmentType: string;
   let fragmentName: string;
-  let _defaultData: (Type.uuid) => _data;
+  let _defaultData: (Record.defaultParam, Type.uuid) => _data;
 };
 
 module type DOMAIN_WRAPPER = {

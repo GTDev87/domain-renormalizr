@@ -274,6 +274,8 @@ module BuildModel(
     type defaultFn = (ModelRecord.defaultParam, idType) => t;
     let findId = ModelRecord.findId;
 
+    let defaultParamData = ModelRecord.defaultParamData;
+
     module Local = ModelRecord.Local;
 
     module Data = {
