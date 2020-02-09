@@ -22,8 +22,8 @@ module GenerateModel = (Root: Domain.ROOT_MODEL, ()): (
   module Root = Root;
   type _t = Domain.SchemaType.t;
 /* LOOK HERE */
-  type Root.t += Schema;
-  type Root.t += Schema = Schema;
+  type Domain.RootModel.t += Schema;
+  type Domain.RootModel.t += Schema = Schema;
 
   type Domain.RootModel.id += Id(Type.uuid);
   type Domain.RootModel.id += Id = Id;
@@ -52,7 +52,7 @@ module GenerateModel = (Root: Domain.ROOT_MODEL, ()): (
 };
 
 module AddModel = (
-  Schema : Domain.SCHEMA_TYPE,
+  SchemaType : Domain.SCHEMA_TYPE,
   ModelType : Domain.MODEL
 ) :
   (Domain.MODEL_RECORD
@@ -70,14 +70,10 @@ module AddModel = (
 
   type model = Model.Record.t;
   type Domain.RootModel.record += Record(model);
-  type Domain.RootModel.t += Schema;
-  type Domain.RootModel.id += Id(Type.uuid);
 
   type _data = Domain.RootModel.data;
 
   type _record = Domain.RootModel.record;
-  type _t = Domain.RootModel.t;
-  type _id = Domain.RootModel.id;
 
   type record = (_record, Domain.SchemaType.t);
 
@@ -102,53 +98,38 @@ module AddModel = (
 };
 
 module type NORMALIZR_GENERATOR_TYPE {
-  type id;
-  type t;
-  type record;
   type normalizedType;
-  let modelIdToIdFunction: (id) => (t, Type.uuid);
+  let modelIdToIdFunction: (Domain.RootModel.id) => (Domain.RootModel.t, Type.uuid);
 
-  let modelTypeToRecordType: (record) => (t, Type.uuid);
+  let modelTypeToRecordType: (Domain.RootModel.record) => (Domain.RootModel.t, Type.uuid);
 
-  let normalizerCommitItemToSchema: (normalizedType, record) => normalizedType;
+  let normalizerCommitItemToSchema: (normalizedType, Domain.RootModel.record) => normalizedType;
 };
 
 module AddRecord(
-  Record : Domain.MODEL_RECORD,
-  NormalizrGenerator: NORMALIZR_GENERATOR_TYPE
-    with type id = Domain.RootModel.id
-    and type t = Domain.RootModel.t
-    and type record = Domain.RootModel.record
-  ,
+  Record : Domain.MODEL_RECORD
+    with type _record = Domain.RootModel.record,
+  NormalizrGenerator: NORMALIZR_GENERATOR_TYPE,
 ) : (
   NORMALIZR_GENERATOR_TYPE
-    with type id = Domain.RootModel.id
-    and type t = Domain.RootModel.t
-    and type record = Domain.RootModel.record
-    and type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record)
+    with type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record)
 ) {
 
-  type id = Domain.RootModel.id;
-  type t = Domain.RootModel.t;
-  type record = Domain.RootModel.record;
-
-  type Domain.RootModel.id += Id(Type.uuid);
-  type Domain.RootModel.t += Schema;
   type Domain.RootModel.record += Record(Record.Model.Record.t);
 
-  type normalizedType = NormalizrNew.normalizedSchema(t, Type.uuid, record);
+  type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record);
 
-  let modelIdToIdFunction = (id: id): (t, Type.uuid) => {
+  let modelIdToIdFunction = (id: Domain.RootModel.id): (Domain.RootModel.t, Type.uuid) => {
     switch(id){
-    | Id(uuid) => (Schema, uuid)
+    | Record.Model.ModelSchemaType.Id(uuid) => (Record.Model.ModelSchemaType.Schema, uuid)
     | _ => NormalizrGenerator.modelIdToIdFunction(id)
     };
   };
   
-  let modelTypeToRecordType = (record: record): (t, Type.uuid) => {
+  let modelTypeToRecordType = (record: Domain.RootModel.record): (Domain.RootModel.t, Type.uuid) => {
     switch(record){
-    | Record(model) => (
-      Schema,
+    | Record.Record(model) => (
+      Record.Model.ModelSchemaType.Schema,
       Record.Model.Record.findId(model)
     )
     | _ => NormalizrGenerator.modelTypeToRecordType(record)
@@ -156,7 +137,7 @@ module AddRecord(
   };
 
   let normalizerCommitItemToSchema:
-    (normalizedType, record) => normalizedType =
+    (normalizedType, Domain.RootModel.record) => normalizedType =
       NormalizrNew.Normalizr.commitItemToSchema(modelTypeToRecordType);
 };
 
@@ -167,25 +148,19 @@ module EmptyNormalizr(
     and type record = Domain.RootModel.record
 ) : (
   NORMALIZR_GENERATOR_TYPE
-    with type id = Domain.RootModel.id
-    and type t = Domain.RootModel.t
-    and type record = Domain.RootModel.record
-    and type normalizedType = NormalizrNew.normalizedSchema(Root.t, Type.uuid, Root.record)
+    with type normalizedType = NormalizrNew.normalizedSchema(Root.t, Type.uuid, Root.record)
 ) = {
   module Implementation = {
-    type id = Domain.RootModel.id;
-    type t = Domain.RootModel.t;
-    type record = Domain.RootModel.record;
-    type normalizedType = NormalizrNew.normalizedSchema(t, Type.uuid, record);
+    type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record);
 
-    let modelIdToIdFunction = (id: id): (t, Type.uuid) => {
+    let modelIdToIdFunction = (id: Domain.RootModel.id): (Domain.RootModel.t, Type.uuid) => {
       switch(id){
       | Root.EMPTY_ID => (Root.EMPTY_T, "")
       | _ => (Root.EMPTY_T, "")
       };
     };
 
-    let modelTypeToRecordType = (record: record): (t, Type.uuid) => {
+    let modelTypeToRecordType = (record: Domain.RootModel.record): (Domain.RootModel.t, Type.uuid) => {
       switch(record){
       | Root.EMPTY_RECORD => (Root.EMPTY_T, "")
       | _ => (Root.EMPTY_T, "")

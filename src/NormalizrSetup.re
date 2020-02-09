@@ -14,10 +14,7 @@ let removeOptionsFromList = (list : list(option('a))) : list('a) =>
 
 module DomainTypeConverter = (
   NormalizrGenerator : ModelUtils.NORMALIZR_GENERATOR_TYPE
-    with type t = Domain.RootModel.t
-    and type id = Domain.RootModel.id
-    and type record = Domain.RootModel.record
-    and type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record),
+    with type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record),
   DomainType: Domain.M
 ) => {
   module Container = DomainType.Container;
@@ -78,17 +75,19 @@ module DomainTypeConverter = (
     Wrapper.apolloEnabled ?
       id
       |> Container.getById
-      |> Belt.Option.map(_, (fragment: DomainType.Model.Fragment.Fields.t) =>
+      |> Belt.Option.map(_, (fragment: DomainType.Model.Fragment.Fields.t) => {
            (
              switch (optionNormalized) {
              | Some(data) => {
-                 local: data.local,
-                 data: DomainType.Model.Record.Data.fromObject(fragment),
+                 {
+                    local: data.local,
+                    data: DomainType.Model.Record.Data.fromObject(fragment),
+                  }
                }
              | None => DomainType.Model.Record.fromObject(fragment) /* does this also generate the local? */
              }: DomainType.Model.Record.t
            )
-         )
+        })
       |> tryAgainifNullOption(_, optionNormalized) :
       optionNormalized;
   };

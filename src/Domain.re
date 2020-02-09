@@ -70,6 +70,7 @@ module type SCHEMA_TYPE = {
   /* module CreatedType: SchemaType; */
 
   type RootModel.id += Id(Type.uuid);
+  type RootModel.t += Schema;
 
   type id;
   type _t =  SchemaType.t;
@@ -143,10 +144,6 @@ module type MODEL_RECORD {
   type _data;
   type _record;
   type _record += Record(Model.Record.t);
-
-  type RootModel.t += Schema;
-  type RootModel.id += Id(Type.uuid);
-  type RootModel.record += Record(Model.Record.t);
 };
 
 module type FRAGMENT = {
