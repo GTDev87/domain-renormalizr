@@ -1,7 +1,7 @@
 type uuid = string;
 
 module type CONTAINER_INTERFACE = {
-  module Fragment: ApolloClient.ReadFragment;
+  module Fragment: ReasonApolloReadFragment.ReadFragment.M;
 };
 
 module type LOCAL_RECORD = {
@@ -143,7 +143,9 @@ module type MODEL_RECORD {
   type model;
   type _data;
   type _record;
-  type _record += Record(Model.Record.t);
+
+  type RootModel.record += Record(Model.Record.t);
+
 };
 
 module type FRAGMENT = {

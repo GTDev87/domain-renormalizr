@@ -7,9 +7,9 @@
   },
   "bs-dependencies": [
     "@glennsl/bs-json",
-    "reason-apollo-hooks",
     "reason-apollo",
-    "reason-react"
+    "reason-react",
+    "reason-apollo-read-fragment"
   ],
   "package-specs": [{
     "module": "commonjs",

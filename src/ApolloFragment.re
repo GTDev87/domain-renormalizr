@@ -1,4 +1,4 @@
-module GenerateContainer = (Client: Type.CLIENT, ReadFragment: ApolloClient.ReadFragment) => (Model: Domain.MODEL) : (
+module GenerateContainer = (Client: Type.CLIENT, ReadFragment: ReasonApolloReadFragment.ReadFragment.M) => (Model: Domain.MODEL) : (
   Domain.CONTAINER
     with type record = Model.Record.t
     and type config = Model.Fragment.Fields.t

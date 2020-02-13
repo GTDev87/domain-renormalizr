@@ -23,10 +23,10 @@ module GenerateModel = (Root: Domain.ROOT_MODEL, ()): (
   type _t = Domain.SchemaType.t;
 /* LOOK HERE */
   type Domain.RootModel.t += Schema;
-  type Domain.RootModel.t += Schema = Schema;
+  // type Domain.RootModel.t += Schema = Schema;
 
   type Domain.RootModel.id += Id(Type.uuid);
-  type Domain.RootModel.id += Id = Id;
+  // type Domain.RootModel.id += Id = Id;
 
   type t = Root.t;
   type id = (Domain.RootModel.id, _t);
