@@ -1,6 +1,6 @@
 {
   "name": "domain-renormalizr",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Fetch bindings for BuckleScript",
   "scripts": {
     "build": "bsb -make-world",
