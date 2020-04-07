@@ -1,6 +1,4 @@
-module CreateFakeFragment(
-  RecordType : Domain.RECORD
-) : (
+module CreateFakeFragment(RecordType : Domain.RECORD) : (
   Domain.FRAGMENT
     with type data = RecordType._data
     and type Fields.t = {. "id": string}
