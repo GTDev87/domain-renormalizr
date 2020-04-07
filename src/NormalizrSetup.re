@@ -108,6 +108,12 @@ module DomainTypeConverter = (
         DomainType.Model.Record.defaultWithId(param, _),
         fromLocal,
         DomainType.Action.reduce);
+
+    let createUpdateIdWithDefault = (
+      id: DomainType.Model.idType,
+      param: DomainType.Model.Record.defaultParam,
+      normalized: NormalizrGenerator.normalizedType,
+    ) => (action) => updateWithDefault(param, normalized |> Js.Promise.resolve, id, action);
   };
 
   module Remote = {
@@ -126,5 +132,11 @@ module DomainTypeConverter = (
         DomainType.Model.Record.defaultWithId(param, _),
         fromSchema, /* How does this handle the llocal??????? */
         DomainType.Action.reduce);
+
+    let createUpdateIdWithDefault = (
+      id: DomainType.Model.idType,
+      param: DomainType.Model.Record.defaultParam,
+      normalized: NormalizrGenerator.normalizedType,
+    ) => (action) => updateWithDefault(param, normalized |> Js.Promise.resolve, id, action);
   };
 };
