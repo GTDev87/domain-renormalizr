@@ -30,4 +30,4 @@ let seat = SeatWithNormalizr.Remote.getRecordWithDefault(seatId, ());
 let updateSeat = SeatWithNormalizr.Remote.updateWithDefault((), seatId, Seat_Action.None);
 let updateSeat2 = SeatWithNormalizr.Remote.createUpdateIdWithDefault(seatId, ());
 
-let optionSeat = SeatConverter.Source.Remote.getRecord(NormalizrStore.getNormalized, seatId);
+let optionSeat = SeatConverter.Source.Remote.getRecord(NormalizrStore.getNormalized(), seatId);

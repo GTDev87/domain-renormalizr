@@ -191,23 +191,18 @@ module DomainTypeConverter = (
       and type defaultParam = DomainType.Model.Record.defaultParam
       and type domainAction = DomainType.Action.action
   ) => {
-    let getRecord = (source, id) => ResourceReducer.getRecord(source(), id);
-
+    let getRecord = ResourceReducer.getRecord;
     let getRecordWithDefault = ResourceReducer.getRecordWithDefault;
-  
     let reduceWithDefault = ResourceReducer.reduceWithDefault;
-  
     let createReduceIdWithDefault = ResourceReducer.createReduceIdWithDefault;
 
     let updateWithDefault = (
       normalized,
-      updateSource,
+      updateNormalized,
       param: DomainType.Model.Record.defaultParam,
       idType: DomainType.Model.idType,
       action: DomainType.Action.action
     ) => {
-      let updateNormalized = updateSource();
-      
       ResourceReducer.reduceWithDefault(
         param,
         normalized |> Js.Promise.resolve,
@@ -218,12 +213,10 @@ module DomainTypeConverter = (
       
     let createUpdateIdWithDefault = (
       normalized,
-      updateSource,
+      updateNormalized,
       id: DomainType.Model.idType,
       param: DomainType.Model.Record.defaultParam,
     ) => {
-      let updateNormalized = updateSource();
-      
       (action) => {
         let actionFunc = ResourceReducer.createReduceIdWithDefault(id, param, normalized);
         actionFunc(action) |> updateNormalized;
