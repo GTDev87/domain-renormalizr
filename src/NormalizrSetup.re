@@ -16,7 +16,7 @@ module type NORMALIZR_STORE = {
   type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record);
   
   let getNormalized: unit => normalizedType;
-  let updateNormalized: (normalizedType) => Js.Promise.t(normalizedType);
+  let getUpdateNormalized: unit => Js.Promise.t(normalizedType) => Js.Promise.t(normalizedType);
 };
 
 module type SOURCE_CONTAINER = {
@@ -33,10 +33,10 @@ module type RESOURCE_REDUCER = {
   type domainAction;
   type defaultParam;
   let getRecord: (normalizedType, idType) => option(domainType);
-
   let getRecordWithDefault: (normalizedType, idType, defaultParam) => domainType;
-  let updateWithDefault: (defaultParam) => (Js.Promise.t(normalizedType), idType, domainAction) => Js.Promise.t(normalizedType);
-  let createUpdateIdWithDefault: (idType, defaultParam, normalizedType) => (domainAction) => Js.Promise.t(normalizedType);
+
+  let reduceWithDefault: (defaultParam) => (Js.Promise.t(normalizedType), idType, domainAction) => Js.Promise.t(normalizedType);
+  let createReduceIdWithDefault: (idType, defaultParam, normalizedType) => (domainAction) => Js.Promise.t(normalizedType);
 };
 
 module DomainTypeConverter = (
@@ -61,7 +61,7 @@ module DomainTypeConverter = (
     |> Belt.List.map(_, modelTypefunction)
     |> removeOptionsFromList;
 
-  let update = (
+  let reduce = (
     default: DomainType.Model.idType => DomainType.Model.Record.t,
     getterFn:
       (NormalizrGenerator.normalizedType, DomainType.Model.idType) =>
@@ -149,17 +149,17 @@ module DomainTypeConverter = (
       |> SourceContainer.getRecord(_, id)
       |> Belt.Option.getWithDefault(_, DomainType.Model.Record.defaultWithId(param, id));
   
-    let updateWithDefault = (param: defaultParam) =>
-      update(
+    let reduceWithDefault = (param: defaultParam) =>
+      reduce(
         DomainType.Model.Record.defaultWithId(param, _),
         getRecord, /* How does this handle the llocal??????? */
         DomainType.Action.reduce);
   
-    let createUpdateIdWithDefault = (
+    let createReduceIdWithDefault = (
       id: idType,
       param: defaultParam,
       normalized: normalizedType,
-    ) => (action) => updateWithDefault(param, normalized |> Js.Promise.resolve, id, action);
+    ) => (action) => reduceWithDefault(param, normalized |> Js.Promise.resolve, id, action);
   };
 
   module LocalSourceContainer = {
@@ -192,13 +192,41 @@ module DomainTypeConverter = (
       ) : DomainType.Model.Record.t =>
         Local.getRecordWithDefault(NormalizeStore.getNormalized(), id, param);
     
-      let updateWithDefault = (param: DomainType.Model.Record.defaultParam) =>
-        Local.updateWithDefault(param, NormalizeStore.getNormalized() |> Js.Promise.resolve);
+      let reduceWithDefault = (param: DomainType.Model.Record.defaultParam) =>
+        Local.reduceWithDefault(param, NormalizeStore.getNormalized() |> Js.Promise.resolve);
+    
+      let createReduceIdWithDefault = (
+        id: DomainType.Model.idType,
+        param: DomainType.Model.Record.defaultParam,
+      ) => Local.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
+
+      let updateWithDefault = (
+        param: DomainType.Model.Record.defaultParam,
+        idType: DomainType.Model.idType,
+        action: DomainType.Action.action
+      ) => {
+        let updateNormalized = NormalizeStore.getUpdateNormalized();
+        
+        Local.reduceWithDefault(
+          param,
+          NormalizeStore.getNormalized() |> Js.Promise.resolve,
+          idType,
+          action
+        ) |> updateNormalized;
+      };
+        
     
       let createUpdateIdWithDefault = (
         id: DomainType.Model.idType,
         param: DomainType.Model.Record.defaultParam,
-      ) => Local.createUpdateIdWithDefault(id, param, NormalizeStore.getNormalized());
+      ) => {
+        let updateNormalized = NormalizeStore.getUpdateNormalized();
+        
+        (action) => {
+          let actionFunc = Local.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
+          actionFunc(action) |> updateNormalized;
+        }
+      };
     };
 
     module Local = AddStoreFunctions(Local);

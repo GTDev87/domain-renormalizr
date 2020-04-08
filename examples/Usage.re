@@ -13,14 +13,14 @@ let optionSeat = SeatConverter.Remote.getRecord(normalized, seatId);
 
 let seat = SeatConverter.Remote.getRecordWithDefault(normalized, seatId);
 
-let updateSeat = SeatConverter.Remote.updateWithDefault((), promiseNormalized, seatId, Seat_Action.None);
+let updateSeat = SeatConverter.Remote.reduceWithDefault((), promiseNormalized, seatId, Seat_Action.None);
 
-let updateSeat2 = SeatConverter.Remote.createUpdateIdWithDefault(seatId, (), normalized);
+let updateSeat2 = SeatConverter.Remote.createReduceIdWithDefault(seatId, (), normalized);
 
 module NormalizrStore = {
   type normalizedType = FullReduced.normalizedType;
   let getNormalized = () => [];
-  let updateNormalized = (normalizr) => Js.Promise.resolve(normalizr);
+  let getUpdateNormalized = () => (normalizr) => normalizr;
 };
 
 module SeatWithNormalizr = SeatConverter.WithStore(NormalizrStore);
