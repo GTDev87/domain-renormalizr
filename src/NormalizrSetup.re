@@ -35,6 +35,8 @@ module type RESOURCE_REDUCER = {
   let getRecord: (normalizedType, idType) => option(domainType);
   let getRecordWithDefault: (normalizedType, idType, defaultParam) => domainType;
 
+  let idListToFilteredItems: (list(idType), normalizedType) => list(domainType);
+
   let reduceWithDefault: (defaultParam) => (Js.Promise.t(normalizedType), idType, domainAction) => Js.Promise.t(normalizedType);
   let createReduceIdWithDefault: (idType, defaultParam, normalizedType) => (domainAction) => Js.Promise.t(normalizedType);
 };
@@ -60,8 +62,6 @@ module DomainTypeConverter = (
     idList
     |> Belt.List.map(_, modelTypefunction)
     |> removeOptionsFromList;
-
-  
 
   let reduce = (
     default: DomainType.Model.idType => DomainType.Model.Record.t,
