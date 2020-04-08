@@ -61,6 +61,8 @@ module DomainTypeConverter = (
     |> Belt.List.map(_, modelTypefunction)
     |> removeOptionsFromList;
 
+  
+
   let reduce = (
     default: DomainType.Model.idType => DomainType.Model.Record.t,
     getterFn:
@@ -150,7 +152,10 @@ module DomainTypeConverter = (
       |> SourceContainer.getRecord(_, id)
       |> Belt.Option.getWithDefault(_, DomainType.Model.Record.defaultWithId(param, id));
 
-    
+    let idListToFilteredItems = (idList: list(DomainType.Model.idType), normalized: NormalizrGenerator.normalizedType) =>
+      idList
+      |> Belt.List.map(_, SourceContainer.getRecord(normalized))
+      |> removeOptionsFromList;
   
     let reduceWithDefault = (param: defaultParam) =>
       reduce(
