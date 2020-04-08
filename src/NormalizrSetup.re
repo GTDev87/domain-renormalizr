@@ -140,6 +140,7 @@ module DomainTypeConverter = (
     type domainAction = DomainType.Action.action;
 
     let getRecord = SourceContainer.getRecord;
+    
     let getRecordWithDefault = (
       normalized: NormalizrGenerator.normalizedType,
       id: DomainType.Model.idType,
@@ -148,6 +149,8 @@ module DomainTypeConverter = (
       normalized
       |> SourceContainer.getRecord(_, id)
       |> Belt.Option.getWithDefault(_, DomainType.Model.Record.defaultWithId(param, id));
+
+    
   
     let reduceWithDefault = (param: defaultParam) =>
       reduce(
@@ -178,6 +181,70 @@ module DomainTypeConverter = (
 
   module Local = GenerateConverterFunc(LocalSourceContainer);
   module Remote = GenerateConverterFunc(RemoteSourceContainer);
+
+
+  module AddSourceFunctions = (
+    ResourceReducer : RESOURCE_REDUCER
+      with type normalizedType = NormalizrGenerator.normalizedType
+      and type idType = DomainType.Model.idType
+      and type domainType = DomainType.Model.Record.t
+      and type defaultParam = DomainType.Model.Record.defaultParam
+      and type domainAction = DomainType.Action.action
+  ) => {
+    let getRecord = (source, id) => ResourceReducer.getRecord(source(), id);
+
+    let getRecordWithDefault = (
+      source,
+      id: DomainType.Model.idType,
+      param: DomainType.Model.Record.defaultParam,
+    ) : DomainType.Model.Record.t =>
+      ResourceReducer.getRecordWithDefault(source(), id, param);
+  
+    let reduceWithDefault = (source, param: DomainType.Model.Record.defaultParam) =>
+      ResourceReducer.reduceWithDefault(param, source() |> Js.Promise.resolve);
+  
+    let createReduceIdWithDefault = (
+      source,
+      id: DomainType.Model.idType,
+      param: DomainType.Model.Record.defaultParam,
+    ) => ResourceReducer.createReduceIdWithDefault(id, param, source());
+
+    let updateWithDefault = (
+      source,
+      updateSource,
+      param: DomainType.Model.Record.defaultParam,
+      idType: DomainType.Model.idType,
+      action: DomainType.Action.action
+    ) => {
+      let updateNormalized = updateSource();
+      
+      ResourceReducer.reduceWithDefault(
+        param,
+        source() |> Js.Promise.resolve,
+        idType,
+        action
+      ) |> updateNormalized;
+    };
+      
+    let createUpdateIdWithDefault = (
+      source,
+      updateSource,
+      id: DomainType.Model.idType,
+      param: DomainType.Model.Record.defaultParam,
+    ) => {
+      let updateNormalized = updateSource();
+      
+      (action) => {
+        let actionFunc = ResourceReducer.createReduceIdWithDefault(id, param, source());
+        actionFunc(action) |> updateNormalized;
+      }
+    };
+  };
+
+  module Source = {
+    module Local = AddSourceFunctions(Local);
+    module Remote = AddSourceFunctions(Remote);
+  };
 
   module WithStore = (
     NormalizeStore : NORMALIZR_STORE
