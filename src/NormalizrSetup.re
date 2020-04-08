@@ -16,7 +16,7 @@ module type NORMALIZR_STORE = {
   type normalizedType = NormalizrNew.normalizedSchema(Domain.RootModel.t, Type.uuid, Domain.RootModel.record);
   
   let getNormalized: unit => normalizedType;
-  let getUpdateNormalized: unit => Js.Promise.t(normalizedType) => Js.Promise.t(normalizedType);
+  let getUpdateNormalized: unit => Js.Promise.t(normalizedType) => Js.Promise.t(unit);
 };
 
 module type SOURCE_CONTAINER = {
@@ -183,22 +183,29 @@ module DomainTypeConverter = (
     NormalizeStore : NORMALIZR_STORE
       with type normalizedType = NormalizrGenerator.normalizedType
   ) => {
-    module AddStoreFunctions = (ResourceReducer : RESOURCE_REDUCER) => {
-      let getRecord = (id) => Local.getRecord(NormalizeStore.getNormalized(), id);
+    module AddStoreFunctions = (
+      ResourceReducer : RESOURCE_REDUCER
+        with type normalizedType = NormalizrGenerator.normalizedType
+        and type idType = DomainType.Model.idType
+        and type domainType = DomainType.Model.Record.t
+        and type defaultParam = DomainType.Model.Record.defaultParam
+        and type domainAction = DomainType.Action.action
+    ) => {
+      let getRecord = (id) => ResourceReducer.getRecord(NormalizeStore.getNormalized(), id);
   
       let getRecordWithDefault = (
         id: DomainType.Model.idType,
         param: DomainType.Model.Record.defaultParam,
       ) : DomainType.Model.Record.t =>
-        Local.getRecordWithDefault(NormalizeStore.getNormalized(), id, param);
+        ResourceReducer.getRecordWithDefault(NormalizeStore.getNormalized(), id, param);
     
       let reduceWithDefault = (param: DomainType.Model.Record.defaultParam) =>
-        Local.reduceWithDefault(param, NormalizeStore.getNormalized() |> Js.Promise.resolve);
+        ResourceReducer.reduceWithDefault(param, NormalizeStore.getNormalized() |> Js.Promise.resolve);
     
       let createReduceIdWithDefault = (
         id: DomainType.Model.idType,
         param: DomainType.Model.Record.defaultParam,
-      ) => Local.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
+      ) => ResourceReducer.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
 
       let updateWithDefault = (
         param: DomainType.Model.Record.defaultParam,
@@ -207,7 +214,7 @@ module DomainTypeConverter = (
       ) => {
         let updateNormalized = NormalizeStore.getUpdateNormalized();
         
-        Local.reduceWithDefault(
+        ResourceReducer.reduceWithDefault(
           param,
           NormalizeStore.getNormalized() |> Js.Promise.resolve,
           idType,
@@ -215,7 +222,6 @@ module DomainTypeConverter = (
         ) |> updateNormalized;
       };
         
-    
       let createUpdateIdWithDefault = (
         id: DomainType.Model.idType,
         param: DomainType.Model.Record.defaultParam,
@@ -223,7 +229,7 @@ module DomainTypeConverter = (
         let updateNormalized = NormalizeStore.getUpdateNormalized();
         
         (action) => {
-          let actionFunc = Local.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
+          let actionFunc = ResourceReducer.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
           actionFunc(action) |> updateNormalized;
         }
       };

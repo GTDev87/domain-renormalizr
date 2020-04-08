@@ -20,7 +20,7 @@ let updateSeat2 = SeatConverter.Remote.createReduceIdWithDefault(seatId, (), nor
 module NormalizrStore = {
   type normalizedType = FullReduced.normalizedType;
   let getNormalized = () => [];
-  let getUpdateNormalized = () => (normalizr) => normalizr;
+  let getUpdateNormalized = () => (normalizr: Js.Promise.t(normalizedType)) => Js.Promise.resolve(());
 };
 
 module SeatWithNormalizr = SeatConverter.WithStore(NormalizrStore);
