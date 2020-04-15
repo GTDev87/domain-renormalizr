@@ -201,6 +201,21 @@ module DomainTypeConverter = (
     let reduceWithDefault = ResourceReducer.reduceWithDefault;
     let createReduceIdWithDefault = ResourceReducer.createReduceIdWithDefault;
 
+    let updateWithPromiseDefault = (
+      normalized,
+      updateNormalized,
+      param: DomainType.Model.Record.defaultParam,
+      idType: DomainType.Model.idType,
+      action: DomainType.Action.action
+    ) => {
+      ResourceReducer.reduceWithDefault(
+        param,
+        normalized,
+        idType,
+        action
+      ) |> updateNormalized;
+    };
+
     let updateWithDefault = (
       normalized,
       updateNormalized,
