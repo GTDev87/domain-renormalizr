@@ -38,7 +38,7 @@ module type RESOURCE_REDUCER = {
   let idListToFilteredItems: (list(idType), normalizedType) => list(domainType);
 
   let reduceWithDefault: (defaultParam) => (Js.Promise.t(normalizedType), idType, domainAction) => Js.Promise.t(normalizedType);
-  let createReduceIdWithDefault: (idType, defaultParam, normalizedType) => (domainAction) => Js.Promise.t(normalizedType);
+  let createReduceIdWithDefault: (normalizedType, idType, defaultParam) => (domainAction) => Js.Promise.t(normalizedType);
 };
 
 module DomainTypeConverter = (
@@ -164,9 +164,9 @@ module DomainTypeConverter = (
         DomainType.Action.reduce);
   
     let createReduceIdWithDefault = (
+      normalized: normalizedType,
       id: idType,
       param: defaultParam,
-      normalized: normalizedType,
     ) => (action) => reduceWithDefault(param, normalized |> Js.Promise.resolve, id, action);
   };
 
@@ -238,7 +238,7 @@ module DomainTypeConverter = (
       param: DomainType.Model.Record.defaultParam,
     ) => {
       (action) => {
-        let actionFunc = ResourceReducer.createReduceIdWithDefault(id, param, normalized);
+        let actionFunc = ResourceReducer.createReduceIdWithDefault(normalized, id, param);
         actionFunc(action) |> updateNormalized;
       }
     };
@@ -275,7 +275,7 @@ module DomainTypeConverter = (
       let createReduceIdWithDefault = (
         id: DomainType.Model.idType,
         param: DomainType.Model.Record.defaultParam,
-      ) => ResourceReducer.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
+      ) => ResourceReducer.createReduceIdWithDefault(NormalizeStore.getNormalized(), id, param);
 
       let updateWithDefault = (
         param: DomainType.Model.Record.defaultParam,
@@ -299,7 +299,7 @@ module DomainTypeConverter = (
         let updateNormalized = NormalizeStore.getUpdateNormalized();
         
         (action) => {
-          let actionFunc = ResourceReducer.createReduceIdWithDefault(id, param, NormalizeStore.getNormalized());
+          let actionFunc = ResourceReducer.createReduceIdWithDefault(NormalizeStore.getNormalized(), id, param);
           actionFunc(action) |> updateNormalized;
         }
       };
