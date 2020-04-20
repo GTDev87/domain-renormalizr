@@ -39,6 +39,7 @@ module type RESOURCE_REDUCER = {
 
   let reduceWithDefault: (defaultParam) => (Js.Promise.t(normalizedType), idType, domainAction) => Js.Promise.t(normalizedType);
   let createReduceIdWithDefault: (normalizedType, idType, defaultParam) => (domainAction) => Js.Promise.t(normalizedType);
+  let createPromiseReduceIdWithDefault: (Js.Promise.t(normalizedType), idType, defaultParam) => (domainAction) => Js.Promise.t(normalizedType);
 };
 
 module DomainTypeConverter = (
@@ -168,6 +169,12 @@ module DomainTypeConverter = (
       id: idType,
       param: defaultParam,
     ) => (action) => reduceWithDefault(param, normalized |> Js.Promise.resolve, id, action);
+
+    let createPromiseReduceIdWithDefault = (
+      normalizedPromise: Js.Promise.t(normalizedType),
+      id: idType,
+      param: defaultParam,
+    ) => (action) => reduceWithDefault(param, normalizedPromise, id, action);
   };
 
   module LocalSourceContainer = {
@@ -200,6 +207,7 @@ module DomainTypeConverter = (
     let getRecordWithDefault = ResourceReducer.getRecordWithDefault;
     let reduceWithDefault = ResourceReducer.reduceWithDefault;
     let createReduceIdWithDefault = ResourceReducer.createReduceIdWithDefault;
+    let createPromiseReduceIdWithDefault = ResourceReducer.createPromiseReduceIdWithDefault;
 
     let updateWithPromiseDefault = (
       normalized,
@@ -239,6 +247,18 @@ module DomainTypeConverter = (
     ) => {
       (action) => {
         let actionFunc = ResourceReducer.createReduceIdWithDefault(normalized, id, param);
+        actionFunc(action) |> updateNormalized;
+      }
+    };
+
+    let createPromiseUpdateIdWithDefault = (
+      normalizedPromise,
+      updateNormalized,
+      id: DomainType.Model.idType,
+      param: DomainType.Model.Record.defaultParam,
+    ) => {
+      (action) => {
+        let actionFunc = ResourceReducer.createPromiseReduceIdWithDefault(normalizedPromise, id, param);
         actionFunc(action) |> updateNormalized;
       }
     };
