@@ -155,7 +155,7 @@ module type FRAGMENT = {
     type t;
     let name: string;
     let query: string;
-    let parse: (Js.Json.t) => t;
+    let parse: ('a) => t;
   };
   
   let fragmentType: string;

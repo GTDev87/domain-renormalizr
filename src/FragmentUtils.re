@@ -1,20 +1,19 @@
 module CreateFakeFragment(RecordType : Domain.RECORD) : (
   Domain.FRAGMENT
     with type data = RecordType._data
-    and type Fields.t = {. "id": string}
 ) {
   type data = RecordType._data;
 
   module Fields = {
-    type t = {. "id": string};
+    type t = {id: string};
     let name: string = "";
     let query: string = "";
-    let parse = (json: Js.Json.t): t => {"id": ""};
+    let parse = (_): t => {id: ""};
   };
   
   let fragmentType = "";
 
-  let toId = (obj) => obj##id;
+  let toId = (_) => "";
   
   let fromObject = (obj: Fields.t): data => RecordType._defaultData(RecordType.defaultParamData, toId(obj));
 }

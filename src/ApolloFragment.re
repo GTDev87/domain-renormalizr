@@ -62,6 +62,7 @@ module GenerateContainer = (Client: Type.CLIENT, ReadFragment: ReasonApolloReadF
 
   [@react.component]
   let make = (~id, ~children) => {
+    /* I can add a hook here */
     <InnerContainer fragmentType=Model.fragmentType id fragmentName=Model.fragmentName>
       ...{(~data : Model.Fragment.Fields.t) =>
         children(data |> Model.Record.fromObject)}

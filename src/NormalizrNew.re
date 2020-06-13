@@ -71,9 +71,7 @@ module Normalizr = {
   let getItemFromSchema = (modelIdToIdFunction, normalizedSchema, modelIdType) => {
     let (schemaType, id) = modelIdToIdFunction(modelIdType);
     normalizedSchema
-    |> Belt.List.getBy(_, ((iterSchemaType, _)) =>
-         schemaType == iterSchemaType
-       )
+    |> Belt.List.getBy(_, ((iterSchemaType, _)) => schemaType == iterSchemaType)
     |> (
       maybeRecordListTuple =>
         switch (maybeRecordListTuple) {
